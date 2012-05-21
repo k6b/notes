@@ -1,0 +1,111 @@
+Domains:
+
+https://tools.mosso.com/			--cloud control
+http://docs.rackspace.com/api/			--api docs
+http://docs-internal.rackspace.com/api/		--internal api docs
+https://wiki.rackspace.corp/Cloud		--main cloud wiki
+http://github.com/rackspace			--lots of cloud stuff
+http://reports.ohthree.com/production		--nextgen backstage
+
+
+-Products
+
+--Cloud Files
+
+Object oriented storage, block storage, no nesting without hax.
+Cloud files in ORD LON DFW, akamai is free for all accts
+Issues using not geographically located DNS servers with CDN ie Google due to geolocation
+
+Cloud files issues 
+- API/Code
+- Networking
+
+CDN issues
+- Mostly networking
+- Issues with particular nodes (escalate for Akamai ticket)
+  - Most get resolved (on their own)
+  - Reproducable issues, ping/traceroute from their location
+  - Zendesk ticket to "Cloud Escalations" -> they make ticket to akamai
+
+API issues
+- 500 errors -> something on our side
+- 400 errors -> customer fucked up
+- try to reproduce customer's issue
+
+Changing end point
+- create zendesk ticket
+- agree to delete EVERYTHING in Cloud Files
+- Customer must reupload themselves
+- no 'migrations' simply changes the provisioning point
+
+API OPERATIONS
+
+v1.0 Auth
+
+curl -iXGET -H "X-Auth-User: soartestaccount" -H "X-Auth-Key: 0e0bc6b2ea72bad5a84e32b577a45532" https://auth.api.rackspacecloud.com/v1.0 
+
+v1.1 Auth
+
+curl -sXPOST -H "Content-Type: application/json" -d '{"credentials":{"username":"soartestaccount","key":"0e0bc6b2ea72bad5a84e32b577a45532"}}' https://auth.api.rackspacecloud.com/v1.1/auth |python -mjson.tool
+
+v2.0 Auth
+
+curl -sXPOST -H "Content-Type: application/json" -d '{"auth":{"RAX-KSKEY:apiKeyCredentials":{"username":"soartestaccount","apiKey":"0e0bc6b2ea72bad5a84e32b577a45532"}}}' https://identity.api.rackspacecloud.com/v2.0/tokens |python -mjson.tool 
+
+
+v2.0 List Users
+
+curl -sXGET -H 'X-Auth-Token: 62f7dd23-e5c9-4164-835c-8f044a0f036b' https://identity.api.rackspacecloud.com/v2.0/users | python -mjson.tool
+
+v2.0 Search User by name
+
+curl -sXGET -H 'X-Auth-Token: 62f7dd23-e5c9-4164-835c-8f044a0f036b' 'https://identity.api.rackspacecloud.com/v2.0/users?name=4wd22r' | python -mjson.tool
+
+v2.0 User info by ID
+
+curl -sXGET -H 'X-Auth-Token: 62f7dd23-e5c9-4164-835c-8f044a0f036b' 'https://identity.api.rackspacecloud.com/v2.0/users/171495' | python -mjson.tool
+
+v2.0 Create users
+
+curl -sXPOST -H "Content-Type: application/json" -H "X-Auth-Token: 62f7dd23-e5c9-4164-835c-8f044a0f036b" -d '{"user":{"username":"testuser","email":"kyle@kylefberry.net","enabled":true,"OS-KSADM:password":"password123"}}' 'https://identity.api.rackspacecloud.com/v2.0/users'
+
+{
+    "user": {
+            "username": "cmarin1subX2",
+            "email": "cmarin1-sub@example.com",
+            "enabled": true,
+            "OS-KSADM:password":"Password48"
+        }
+}
+
+v2.0 Update user
+
+curl -sXPOST -H "Content-Type: application/json" -H "X-Auth-Token: 62f7dd23-e5c9-4164-835c-8f044a0f036b" -d '{"user":{"username":"testuser","email":"kyle@kylefberry.net","enabled":true,"OS-KSADM:password":"password123"}}' 'https://identity.api.rackspacecloud.com/v2.0/users/171495'
+
+{
+  "user": {
+    "id": "123456",
+    "username": "jqsmith",
+    "email": "john.smith@example.org",
+    "enabled": true
+  }
+}
+
+v2.0 Delete User
+
+curl -sXDELETE -H -H "X-Auth-Token: 62f7dd23-e5c9-4164-835c-8f044a0f036b" 'https://identity.api.rackspacecloud.com/v2.0/users/193895'
+
+To User ID
+
+v2.0 Add credentials to users
+
+curl -sXPOST -H "Content-Type: application/json" -H "X-Auth-Token: 62f7dd23-e5c9-4164-835c-8f044a0f036b" -d {"passwordCredentials": {"username": "test_user","password": "resetpass"}} 'https://identity.api.rackspacecloud.com/v2.0/users/193895'
+
+{
+    "passwordCredentials": {
+        "username": "test_user",
+        "password": "resetpass"
+    }
+}
+
+
